@@ -9,6 +9,10 @@ classification metrics, embedding diagnostics, config, tests, and orchestration.
 **Task:** binary sentiment classification on 50,000 IMDb movie reviews, using
 Word2Vec embeddings trained from scratch as the input layer to a neural network.
 
+> 🎬 **Live demo:** an interactive Streamlit app lives in [`demo/`](demo/) — type a
+> review, get a live prediction. Deploy it free on Hugging Face Spaces (see
+> [`demo/README.md`](demo/README.md)).
+
 ## Results
 
 Full run (`python run_pipeline.py`), three disjoint splits

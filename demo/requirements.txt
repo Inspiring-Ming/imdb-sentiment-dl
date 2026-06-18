@@ -1,0 +1,5 @@
+# Pinned for Hugging Face Spaces (Linux, Python 3.11).
+# The model was saved with Keras 3, so we need TF >= 2.16 (which bundles Keras 3).
+streamlit==1.40.2
+tensorflow-cpu==2.17.1
+numpy==1.26.4
