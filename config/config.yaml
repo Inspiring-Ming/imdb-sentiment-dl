@@ -1,0 +1,32 @@
+# All experiment knobs live here — no magic numbers in the code.
+project:
+  random_state: 42
+
+data:
+  num_words: 10000        # vocab size (top-N most frequent words)
+  maxlen: 300             # pad/truncate reviews to this many tokens
+  val_size: 0.2           # carve a validation set out of the 25k train reviews
+
+embeddings:
+  vector_size: 100        # Word2Vec dimensionality
+  window: 5
+  min_count: 2            # drop hapax legomena (tutorial used 1 -> noisy)
+  sg: 1                   # 1 = skip-gram, 0 = CBOW
+  epochs: 5
+  workers: 4
+
+model:
+  # which architecture to train: "mlp" (tutorial-style), "pool" (global avg pool),
+  # or "lstm" (sequence model). The pipeline runs a bake-off across all three.
+  architectures: ["mlp", "pool", "lstm"]
+  dense_units: 128
+  dropout: 0.5
+  lstm_units: 64
+  epochs: 5
+  batch_size: 64
+  trainable_embeddings: false   # freeze Word2Vec weights (tutorial choice)
+
+paths:
+  models_dir: models
+  reports_dir: reports
+  docs_dir: docs
