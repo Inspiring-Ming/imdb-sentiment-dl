@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IMDb Sentiment — architecture bake-off — Jasmin Yu</title>
+<style>
+ :root{--fg:#1a1a1a;--mut:#666;--line:#e5e5e5;--acc:#0b3d91;--bg:#fff;--code:#f6f8fa}
+ @media(prefers-color-scheme:dark){:root{--fg:#e8e8e8;--mut:#9aa0a6;--line:#2a2a2a;--acc:#7aa2e3;--bg:#111;--code:#1a1a1a}}
+ *{box-sizing:border-box}
+ body{margin:0;padding:2.5rem 1.25rem 4rem;font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:var(--fg);background:var(--bg)}
+ .wrap{max-width:780px;margin:0 auto}
+ h1{font-size:1.9rem;margin:0 0 .3rem;letter-spacing:-.02em}
+ .sub{color:var(--mut);margin:0 0 1.5rem}
+ .links a{display:inline-block;margin:0 .6rem .6rem 0;padding:.4rem .8rem;border:1px solid var(--line);border-radius:6px;text-decoration:none;color:var(--acc);font-size:.9rem}
+ .links a:hover{border-color:var(--acc)}
+ h2{font-size:1.15rem;margin:2.2rem 0 .6rem;padding-bottom:.35rem;border-bottom:1px solid var(--line)}
+ pre{background:var(--code);padding:1rem;border-radius:8px;overflow-x:auto;font-size:.82rem;line-height:1.5}
+ code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+ table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.92rem}
+ th,td{text-align:left;padding:.55rem .6rem;border-bottom:1px solid var(--line);vertical-align:top}
+ th{color:var(--mut);font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
+ img{max-width:100%;border:1px solid var(--line);border-radius:8px;margin:.5rem 0}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+ @media(max-width:640px){.grid{grid-template-columns:1fr}}
+ .tag{display:inline-block;background:var(--code);padding:.15rem .5rem;border-radius:4px;font-size:.78rem;margin-right:.3rem;font-family:ui-monospace,monospace}
+ blockquote{margin:1rem 0;padding:.6rem 0 .6rem 1rem;border-left:3px solid var(--acc);color:var(--mut)}
+ footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--line);color:var(--mut);font-size:.85rem}
+ a{color:var(--acc)}
+</style>
+</head>
+<body><div class="wrap">
+
+<h1>IMDb Sentiment</h1>
+<p class="sub">A three-way architecture bake-off, run properly: same data, same splits, one variable changed.</p>
+
+<p class="links">
+  <a href="https://github.com/Inspiring-Ming/imdb-sentiment-dl">Repository</a>
+  <a href="https://github.com/Inspiring-Ming/imdb-sentiment-dl/tree/main/src">Source</a>
+  <a href="https://github.com/Inspiring-Ming/imdb-sentiment-dl/tree/main/demo">Demo app</a>
+</p>
+
+<h2>The question</h2>
+<p>The standard Keras tutorial flattens an embedding layer into a dense network. That throws away
+word order and inflates the parameter count. Does a better-chosen architecture actually help, or
+is it the kind of change people assume helps without measuring?</p>
+
+<h2>What I built</h2>
+<p>Three models over identical splits (20k train / 5k validation / 25k held-out test), differing
+only in how they pool the embedding:</p>
+
+<table>
+<tr><th>Architecture</th><th>Validation accuracy</th></tr>
+<tr><td><code>mlp</code> — Flatten → Dense <i>(the tutorial)</i></td><td>0.814</td></tr>
+<tr><td><b><code>pool</code> — GlobalAveragePooling → Dense</b> ⭐</td><td><b>0.838</b></td></tr>
+<tr><td><code>lstm</code> — LSTM → Dense</td><td>0.819</td></tr>
+</table>
+
+<p><b>Held-out test set, winner:</b> accuracy <b>0.838</b>, F1 <b>0.840</b>.</p>
+
+<h2>What I found</h2>
+<blockquote>Average-pooling beat both the tutorial baseline and the LSTM. The expensive
+sequence model was not the answer; the cheap structural fix was. Reporting precision, recall
+and a confusion matrix rather than accuracy alone is what made that visible.</blockquote>
+
+<div class="grid">
+  <div><img src="training_curves.png" alt="Training curves"><br><span class="sub">Training curves</span></div>
+  <div><img src="confusion_matrix.png" alt="Confusion matrix"><br><span class="sub">Confusion matrix</span></div>
+</div>
+<img src="tsne_embeddings.png" alt="t-SNE of learned embeddings">
+<p class="sub">t-SNE of the learned embedding space.</p>
+
+<h2>How it runs</h2>
+<pre><code>make train ARCH=pool      # config-driven, one variable per run
+make evaluate             # accuracy, precision/recall/F1, confusion matrix
+make demo                 # containerised inference app</code></pre>
+<p>Config-driven and tested, so a result can be reproduced rather than remembered.</p>
+
+<p>
+<span class="tag">Python</span><span class="tag">TensorFlow/Keras</span><span class="tag">Word2Vec</span>
+<span class="tag">NLP</span><span class="tag">Docker</span><span class="tag">pytest</span>
+</p>
+
+<footer>
+Jasmin (Mingqin) Yu ·
+<a href="https://github.com/Inspiring-Ming">GitHub</a> ·
+<a href="https://www.linkedin.com/in/mingqin-yu/">LinkedIn</a>
+</footer>
+
+</div></body></html>
