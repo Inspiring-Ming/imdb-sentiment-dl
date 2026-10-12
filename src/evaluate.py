@@ -38,7 +38,7 @@ def evaluate(model, X, y_true, out_png: str | None = None) -> dict:
     if out_png:
         cm = confusion_matrix(y_true, y_pred)
         disp = ConfusionMatrixDisplay(cm, display_labels=CLASSES)
-        disp.plot(cmap="Blues", colorbar=False)
+        disp.plot(cmap="Blues", colorbar=False, values_format="d")
         plt.title("IMDb sentiment — confusion matrix")
         plt.tight_layout()
         plt.savefig(out_png, dpi=120)
